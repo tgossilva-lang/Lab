@@ -1,0 +1,5 @@
+[
+  { "hostname": "PC001", "lab": "LabA", "vlan": "10.0.10.0/24", "tags": ["alunos"] },
+  { "hostname": "PC002", "lab": "LabA", "vlan": "10.0.10.0/24", "tags": ["alunos"] },
+  { "hostname": "PC010", "lab": "LabB", "vlan": "10.0.20.0/24", "tags": ["prova"] }
+]

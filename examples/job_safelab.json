@@ -1,0 +1,31 @@
+{
+  "job_id": "2026-01-24-safelab-001",
+  "targets": { "labs": ["LabA", "LabB"], "mode": "all" },
+  "concurrency": { "global": 20, "per_lab": 5, "throttle_ipg_ms": 50 },
+  "actions": [
+    {
+      "action": "SyncFolder",
+      "source_path": "\\\\servidor\\repo\\SafeLab",
+      "dest_path": "C:\\SafeLab_Aluno",
+      "strategy": "mtime_size"
+    },
+    {
+      "action": "DeletePath",
+      "target_path": "C:\\SafeLab_Aluno_Old",
+      "recursive": true,
+      "exclude_patterns": ["keep.txt"]
+    },
+    {
+      "action": "CreateShortcut",
+      "target_path": "C:\\SafeLab_Aluno\\SafeLab.exe",
+      "shortcut_path": "PublicDesktop:SafeLab.lnk",
+      "icon_path": "C:\\SafeLab_Aluno\\SafeLab.ico"
+    },
+    {
+      "action": "CollectPath",
+      "source_path": "C:\\SafeLab_Aluno\\logs",
+      "collect_root": "\\\\servidor\\coletas"
+    }
+  ],
+  "audit": { "requested_by": "user@dominio.local", "job_note": "Atualização SafeLab + limpeza" }
+}
