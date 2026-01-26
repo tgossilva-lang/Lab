@@ -1,0 +1,4 @@
+# Liste um host por linha
+server01
+192.168.1.20
+server03.local
