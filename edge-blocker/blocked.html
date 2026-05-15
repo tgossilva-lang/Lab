@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Acesso Restrito</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0a0a0f; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: 'Segoe UI', sans-serif; }
+    .card { background: #13131a; border: 1px solid #2a2a3a; border-radius: 16px; padding: 48px 40px; width: 380px; text-align: center; box-shadow: 0 0 60px rgba(0,100,255,0.15); }
+    .icon { font-size: 52px; margin-bottom: 16px; }
+    h2 { color: #fff; font-size: 22px; margin-bottom: 8px; font-weight: 600; }
+    .sub { color: #888; font-size: 14px; margin-bottom: 28px; line-height: 1.5; }
+    input { width: 100%; padding: 13px 16px; background: #1e1e2e; border: 1px solid #3a3a5a; border-radius: 8px; color: #fff; font-size: 15px; margin-bottom: 10px; outline: none; transition: border-color 0.2s; }
+    input:focus { border-color: #1a6ef5; }
+    input.shake { animation: shake 0.3s; border-color: #ff4444; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+    .msg-erro { color: #ff4444; font-size: 13px; margin-bottom: 12px; min-height: 18px; }
+    button { width: 100%; padding: 13px; background: #1a6ef5; border: none; border-radius: 8px; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    button:hover { background: #1558cc; }
+    .aviso { color: #ff9900; font-size: 12px; margin-top: 10px; min-height: 16px; }
+    .rodape { color: #444; font-size: 11px; margin-top: 20px; }
+    #telaNegada { display: none; flex-direction: column; align-items: center; }
+    #telaNegada.ativo { display: flex; }
+    #telaSenha.oculto { display: none; }
+    .negado-icon { font-size: 64px; margin-bottom: 20px; }
+    .negado-titulo { color: #ff4444; font-size: 24px; font-weight: 700; margin-bottom: 12px; }
+    .negado-sub { color: #888; font-size: 14px; line-height: 1.6; }
+    .negado-code { background: #1a0000; border: 1px solid #ff4444; border-radius: 8px; padding: 12px 20px; margin: 20px 0; color: #ff4444; font-size: 13px; font-family: monospace; letter-spacing: 1px; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div id="telaSenha">
+    <div class="icon">🔒</div>
+    <h2>Acesso Restrito</h2>
+    <p class="sub">Esta página está protegida pelo administrador do sistema.</p>
+    <input type="password" id="senha" placeholder="Digite a senha de administrador" autocomplete="off" />
+    <div class="msg-erro" id="erro"></div>
+    <button id="btn">Desbloquear</button>
+    <p class="aviso" id="aviso"></p>
+    <p class="rodape">Bloqueador de Configurações</p>
+  </div>
+  <div id="telaNegada">
+    <div class="negado-icon">🚫</div>
+    <div class="negado-titulo">ACESSO NÃO AUTORIZADO</div>
+    <p class="negado-sub">Número máximo de tentativas atingido.<br>Esta tentativa foi registrada.</p>
+    <div class="negado-code">ERRO 403 — ACESSO BLOQUEADO</div>
+    <p class="negado-sub">Entre em contato com o administrador do sistema.</p>
+    <p class="rodape" style="margin-top:20px;">Bloqueador de Configurações</p>
+  </div>
+</div>
+<script>
+  const MAX = 3;
+  const params = new URLSearchParams(window.location.search);
+  const from = params.get("from") || "";
+  let tentativas = parseInt(sessionStorage.getItem("bloq_tentativas") || "0");
+
+  const telaSenha = document.getElementById("telaSenha");
+  const telaNegada = document.getElementById("telaNegada");
+  const input = document.getElementById("senha");
+  const btn = document.getElementById("btn");
+  const erro = document.getElementById("erro");
+  const aviso = document.getElementById("aviso");
+
+  if (tentativas >= MAX) {
+    telaSenha.classList.add("oculto");
+    telaNegada.classList.add("ativo");
+  } else {
+    input.focus();
+    if (tentativas > 0) aviso.textContent = `⚠️ ${MAX - tentativas} tentativa(s) restante(s)`;
+  }
+
+  function tentar() {
+    chrome.storage.local.get("password", (data) => {
+      const senha = data.password || "admin123";
+      if (input.value === senha) {
+        sessionStorage.removeItem("bloq_tentativas");
+        window.location.href = from || "edge://newtab";
+      } else {
+        tentativas++;
+        sessionStorage.setItem("bloq_tentativas", tentativas);
+        input.value = "";
+        input.classList.add("shake");
+        setTimeout(() => input.classList.remove("shake"), 400);
+        if (tentativas >= MAX) {
+          telaSenha.classList.add("oculto");
+          telaNegada.classList.add("ativo");
+          return;
+        }
+        const rest = MAX - tentativas;
+        erro.textContent = `Senha incorreta.`;
+        aviso.textContent = `⚠️ ${rest} tentativa(s) restante(s)`;
+        input.focus();
+      }
+    });
+  }
+
+  btn.addEventListener("click", tentar);
+  input.addEventListener("keydown", e => { if (e.key === "Enter") tentar(); });
+</script>
+</body>
+</html>

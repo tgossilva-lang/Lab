@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<gupdate xmlns='http://www.google.com/update2/response' protocol='2.0'>
+  <app appid='cppdnhjdjaebajmlkmfagkmfljjjmmlf'>
+    <updatecheck status='ok'>
+      <urls>
+        <url codebase='https://tgossilva-lang.github.io/Lab/edge-blocker/edge-blocker.crx'/>
+      </urls>
+      <manifest version='1.0.0'>
+        <packages>
+          <package name='edge-blocker.crx' required='true'/>
+        </packages>
+      </manifest>
+    </updatecheck>
+  </app>
+</gupdate>
